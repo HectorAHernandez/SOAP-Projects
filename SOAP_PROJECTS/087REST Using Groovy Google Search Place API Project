@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="6fcd5194-c437-4044-a61a-3d81be11f605" activeEnvironment="Default" name="07REST Using Groovy Script Assert With JSON Response Project" resourceRoot="" soapui-version="5.5.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:RestService" id="27f4e69d-610a-4108-93f6-1994489fcab0" wadlVersion="http://wadl.dev.java.net/2009/02" name="https://maps.googleapis.com" type="rest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart=""/><con:endpoints><con:endpoint>https://maps.googleapis.com</con:endpoint></con:endpoints><con:resource name="Json" path="/maps/api/place/textsearch/json" id="bc2efe5b-9258-425d-a991-b729406d5ec7"><con:settings/><con:parameters><con:parameter><con:name>query</con:name><con:value>restaurants in Sydney</con:value><con:style>QUERY</con:style><con:default>restaurants in Sydney</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>key</con:name><con:value>AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw</con:value><con:style>QUERY</con:style><con:default>AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="Json 1" id="de1c2c03-8702-4bb5-86a3-63ba6ab31821" method="GET"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType>application/json; charset=UTF-8</con:mediaType><con:status>200</con:status><con:params/><con:element xmlns:json="https://maps.googleapis.com/maps/api/place/textsearch/json">json:Response</con:element></con:representation><con:request name="Request 1" id="0fb6f393-f11a-44c3-b1ba-d007969c42d8" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#endPoint}</con:endpoint><con:request/><con:originalUri>https://maps.googleapis.com/maps/api/place/textsearch/json</con:originalUri><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="query" value="restaurants in Sydney"/>
+  <con:entry key="key" value="${#Project#myKey}"/>
+</con:parameters><con:parameterOrder><con:entry>query</con:entry><con:entry>key</con:entry></con:parameterOrder></con:request></con:method></con:resource></con:interface><con:testSuite id="f1ffc6b2-62fd-484e-a135-45df4d6788fd" name="SearchPlaces JSON Format TestSuite"><con:description>TestSuite generated for REST Service [https://maps.googleapis.com]</con:description><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="d9581a5a-8ccf-4e1c-9557-31dc23706823" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Search Places TestCase" searchProperties="true"><con:description>TestCase generated for REST Resource [Json] located at [/maps/api/place/textsearch/json]</con:description><con:settings/><con:testStep type="restrequest" name="JSON RESONSE Request" id="48685090-df05-41c4-ba11-2bd1b449f376"><con:settings/><con:config service="https://maps.googleapis.com" resourcePath="/maps/api/place/textsearch/json" methodName="Json 1" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="JSON RESONSE Request" id="0fb6f393-f11a-44c3-b1ba-d007969c42d8" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#endPoint}</con:endpoint><con:request/><con:originalUri>https://maps.googleapis.com/maps/api/place/textsearch/json</con:originalUri><con:assertion type="GroovyScriptAssertion" id="9824e943-0524-4bb3-b4ee-4d97166130e4" name="Script Assertion"><con:configuration><scriptText>// validate that the "id" in the 5th result has the value of 670f64fa781098196ac56391684d89134d0b54e9
+
+// there are two way of automate using scripting in SOAPUI:
+//	1- Adding a testStep with Groovy format, like we did in project "04AutomationWithGroovySOAPProject" with the
+//      testCase "GroovyScriptTestCase" and testStep "FirstGroovyScript"
+//   2- Using this "ScriptAssertion" functionality when creating Assertions.
+// the top header in this panel "Script is invoked with log, context, and message Exchange variables" means that 
+// we CANNOT use external variable/properties when scripting in Assertions, so testRunner variable access is NOT 
+// allowed.
+    
+    import groovy.json.JsonSlurper   // to be able to parse the JASON in the RESPONSE into an object "parsedResponse"
+// the first step we need to execute is to grabb the content of the RESPONSE, for this we need to use the 
+// messageExchange variable like this: "messageExchange.response.responseContent and move it to a varialble:
+    def response = messageExchange.response.responseContent
+// in SOAP wen we needed to pass the XML content of a RESPONSE OR REQUEST property to an object so that we can later
+// be able to access/PARSE each nodes in the XML, we used the Groovy Class XmlHolder, Now to do the same with this
+// JSON RESPONSE property we need to use the Grrovy class JsonSlurper, wo we have to import it (see above) 
+// now to parse the RESPONSE in JSON in the object parsedResponse:
+    def parsedResponse = new JsonSlurper().parseText(response)
+// Now guided by the content in the JSON online Editor (https://jsoneditoronline.org/) we can access the content of 
+// the id attrbute, which is in the 5th (index #4) Element of the result array like this: parsedResponse.results[4].id
+// Save the actual place_id in the parsedResponse object:   
+   def actualPlaceId = parsedResponse.results[4].place_id
+   log.info "     -- The id is: "+parsedResponse.results[4].place_id
+// if we want to access "lat" property undert the "geometry and locations" parents,  in the 6th element
+// Save the actual latitud in the parsedResponse object: 
+   def actualLatitud = parsedResponse.results[5].geometry.location.lat
+   log.info "    -- The latitud is: "+ parsedResponse.results[5].geometry.location.lat
+// get the place_id and latitud  in custom properties for this TestCase "Searh Places TestCase"
+   def expectedPlaceId = context.getTestCase().getPropertyValue("placeIdPropt")
+   def expectedLatitud = context.getTestCase().getPropertyValue("latitudPropt")
+
+// make the validations usingAassertsions   
+   assert actualPlaceId == expectedPlaceId
+   //assert actualLatitud == expectedLatitud
+// get actual open now on the 5th result, to validate its content.
+   def actualOpenNow = parsedResponse.results[4].opening_hours.open_now
+   assert actualOpenNow == false    //note in XML must be in double quote "false"    
+
+// verify if the status at the end of the response it OK
+   def acutalStatus = parsedResponse.status
+   assert acutalStatus == "OK"  </scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="query" value="restaurants in Sydney"/>
+  <con:entry key="key" value="${#Project#myKey}"/>
+</con:parameters><con:parameterOrder><con:entry>query</con:entry><con:entry>key</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:properties><con:property><con:name>placeIdPropt</con:name><con:value>ChIJ-choyF2uEmsRIosIxEjVxnA</con:value></con:property><con:property><con:name>latitudPropt</con:name><con:value>-33.85756</con:value></con:property></con:properties></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>myKey</con:name><con:value>AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw</con:value></con:property><con:property><con:name>endPoint</con:name><con:value>https://maps.googleapis.com</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="b81fa7b4-060d-4151-b905-2c64b1514f18" activeEnvironment="Default" name="08REST Using Groovy Script Assert With XML Response Project" resourceRoot="" soapui-version="5.5.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:RestService" id="f360624d-095b-41c2-8447-df6d93223d61" wadlVersion="http://wadl.dev.java.net/2009/02" name="https://maps.googleapis.com" type="rest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart=""/><con:endpoints><con:endpoint>https://maps.googleapis.com</con:endpoint></con:endpoints><con:resource name="Xml" path="/maps/api/place/textsearch/xml" id="59abbdf2-d515-410b-ae1d-ae4d86b89a9d"><con:settings/><con:parameters><con:parameter><con:name>query</con:name><con:value>restaurants in Sydney</con:value><con:style>QUERY</con:style><con:default>restaurants in Sydney</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>key</con:name><con:value>AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw</con:value><con:style>QUERY</con:style><con:default>AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="Xml 1" id="9c462cae-d6c2-4fcf-9686-cc027a0227c7" method="GET"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType>application/xml; charset=UTF-8</con:mediaType><con:status>200</con:status><con:params/><con:element>PlaceSearchResponse</con:element></con:representation><con:request name="Request 1" id="152135be-4b86-40e5-bc8b-467da22a7bff" mediaType="application/json"><con:settings/><con:endpoint>https://maps.googleapis.com</con:endpoint><con:request/><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="query" value="restaurants in Sydney"/>
+  <con:entry key="key" value="AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw"/>
+</con:parameters><con:parameterOrder><con:entry>query</con:entry><con:entry>key</con:entry></con:parameterOrder></con:request></con:method></con:resource></con:interface><con:testSuite id="5c8a8128-9ab3-4e71-a1a2-e6dcc1171d43" name="SearchPlaces XML Format TestSuite"><con:description>TestSuite generated for REST Service [https://maps.googleapis.com]</con:description><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="a819e33c-5521-4cca-8cbf-a1ee592236ee" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Xml TestCase" searchProperties="true"><con:description>TestCase generated for REST Resource [Xml] located at [/maps/api/place/textsearch/xml]</con:description><con:settings/><con:testStep type="restrequest" name="XML RESONSE Request" id="e2028247-5789-4507-89d6-461eea3b4c26"><con:settings/><con:config service="https://maps.googleapis.com" resourcePath="/maps/api/place/textsearch/xml" methodName="Xml 1" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="XML RESONSE Request" id="152135be-4b86-40e5-bc8b-467da22a7bff" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#endPoint}</con:endpoint><con:request/><con:originalUri>https://maps.googleapis.com/maps/api/place/textsearch/xml</con:originalUri><con:assertion type="GroovyScriptAssertion" id="55f19de1-dc9a-4f21-bafb-128d9ed9a9bb" name="Script Assertion"><con:configuration><scriptText><![CDATA[// validate that the "id" in the 5th result has the value of 670f64fa781098196ac56391684d89134d0b54e9
+
+// there are two way of automate using scripting in SOAPUI:
+//	1- Adding a testStep with Groovy format, like we did in project "04AutomationWithGroovySOAPProject" with the
+//      testCase "GroovyScriptTestCase" and testStep "FirstGroovyScript"
+//   2- Using this "ScriptAssertion" functionality when creating Assertions.
+// the top header in this panel "Script is invoked with log, context, and message Exchange variables" means that 
+// we CANNOT use external variable/properties when scripting in Assertions, so testRunner variable access is NOT 
+// allowed.
+
+    import com.eviware.soapui.support.XmlHolder // to be able to parse the XML in the RESPONSE into an object "parsedResponse"
+    // import groovy.json.JsonSlurper  (This is for JSON, same as above)
+// the first step we need to execute is to grabb the content of the RESPONSE, for this we need to use the 
+// messageExchange variable like this: "messageExchange.response.responseContent and move it to a varialble:
+def response = messageExchange.responseContentAsXml
+//    def response = messageExchange.response.responseContent      //same as with JSON.
+// in SOAP wen we needed to pass the XML content of a RESPONSE OR REQUEST property to an object so that we can later
+// be able to access/PARSE each nodes in the XML, we used the Groovy Class XmlHolder, Now to do the same with in
+// JSON RESPONSE property we need to use the Grrovy class JsonSlurper, wo we have to import it (see above) 
+// now to parse the RESPONSE in to XML in the object parsedResponse:
+    def parsedResponse = new XmlHolder(response)
+// Now guided by the content in the XML in the RESPONSE property, we can access the content of 
+// the id attrbute, which is in the 5th (index #5 NOTE IN XML the INDEX starts in 1 not in 0 line in JSON, because it NOT array.)  Element of the result array like this: parsedResponse.results[4].id
+// Save the actual place_id in the parsedResponse object:   
+   def actualPlaceId = parsedResponse.getNodeValue("//PlaceSearchResponse/result[5]/place_id")
+   log.info "     -- The id is: "+ parsedResponse.getNodeValue("//PlaceSearchResponse/result[4]/place_id")
+   //Note: this Xpath works because response xml has a name for the namespace for the response, defined as <PlaceSearchResponse>, se below OR some times it is defined 
+   //      like this:
+   //1-   <Response xmlns:typ="http://sample.com/reservation/guest/types"> // where typ= is the name of the namespace that can be used to identify the nodeValues in the
+   //            xpath like parsedResponse.getNodeValue("//typ:result[4]/typ:place_id")  OR:
+   //2-  <PlaceSearchResponse>       --- parent namespace -- 
+  //        <status>OK</status>
+  //        <result>
+  //            <name>The Deck Sydney</name>
+  //            <type>restaurant</type>
+  //            <type>food</type>
+  //            <type>point_of_interest</type>
+  //            <type>establishment</type>
+  //... 
+  // But some time there is no name associated to the namespce for the response xnl, then we have to create it.
+  //   <Response xmlns:"http://sample.com/reservation/guest/types"> // where There is NO name, (typ= is the name for the spacename of the respose xml), AFTER xmlns (xml name space) clause.
+  // So, because there is no name for the namespace the Xpath WON'T WORK, this is it will be generating NULL value, event we see the value and NO error generated.
+  // to FIX this we have to manually create/declare the namespace as follow:
+  //declare namespace ns4='http://sample.com/reservation/guest/types'
+  // so we can use: parsedResponse.getNodeValue("ns4:addEmployeeResponse/ns4:return")   OR
+  //                parsedResponse.getNodeValue("//typ:result[4]/typ:geometry/typ:lat")
+  
+  // but when manually defining the namespace in the Groovy code we have to link it to the parsedResponse holding the XML, using the namespaces() method that
+  // belog to the parsedResponse, as follows:
+  //   parsedResponse.namespace["ns4"] ='http://sample.com/reservation/guest/types'         
+  // and now we can use: parsedResponse.getNodeValue("//typ:result[4]/typ:geometry/typ:lat")
+
+    
+// if we want to access "lat" property undert the "geometry and locations" parents,  in the 6th element
+// Save the actual latitud in the parsedResponse object: 
+   def actualLatitud = parsedResponse.getNodeValue("//PlaceSearchResponse/result[5]/geometry/location/lat")
+   log.info "    -- The latitud is: "+ parsedResponse.getNodeValue("//PlaceSearchResponse/result[5]/geometry/location/lat")
+// get the place_id and latitud  in custom properties for this TestCase "Searh Places TestCase"
+   def expectedPlaceId = context.getTestCase().getPropertyValue("placeIdPropt")   
+   def expectedLatitud = context.getTestCase().getPropertyValue("latitudPropt")
+
+// make the validations usingAassertsions   
+   assert actualPlaceId == expectedPlaceId
+   //assert actualLatitud == expectedLatitud
+// get actual open now on the 5th result, to validate its content.
+   def actualOpenNow = parsedResponse.getNodeValue("//PlaceSearchResponse/result[4]/opening_hours/open_now")  //this is generating false value instead of false.
+   assert actualOpenNow == "false"    //note in JSON must be WITHOUT th double quote false
+ 
+// verify if the status at the end of the response it OK
+   def acutalStatus = parsedResponse.getNodeValue("//PlaceSearchResponse/status")
+   assert acutalStatus == "OK"  
+// displays the value of "food" located in the second "type" node in the 4th results:  in XML the index start in 1, not in 0 like in JSON, because it NOT array.
+   log.info "the value of food is: " + parsedResponse.getNodeValue("//PlaceSearchResponse/result[4]/type[2]")]]></scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="query" value="restaurants in Sydney"/>
+  <con:entry key="key" value="${#Project#myKey}"/>
+</con:parameters><con:parameterOrder><con:entry>query</con:entry><con:entry>key</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:properties><con:property><con:name>latitudPropt</con:name><con:value>-33.8575600</con:value></con:property><con:property><con:name>placeIdPropt</con:name><con:value>ChIJ-choyF2uEmsRIosIxEjVxnA</con:value></con:property></con:properties></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>myKey</con:name><con:value>AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw</con:value></con:property><con:property><con:name>endPoint</con:name><con:value>https://maps.googleapis.com</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>

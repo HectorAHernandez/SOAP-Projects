@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="0d61dd41-91d6-4af6-9ef2-25b0bded36d4" activeEnvironment="Default" name="14Groovy Tutorial" resourceRoot="" soapui-version="5.5.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:testSuite id="f48eca38-3cc6-4dff-bd33-ff48c3882740" name="TestSuite 1"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="e5ea1906-1a38-4007-80f2-f8753b8bed4e" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TestCase 1" searchProperties="true"><con:settings/><con:testStep type="groovy" name="First Tutorial Groovy Script" id="4c09cd46-2941-4595-b34d-a27cadd55cb5"><con:settings/><con:config><script><![CDATA[// This is a Groovy comment.
+/* This is another Groovy commets
+   tha can expand for multiple lines*/ 
+// to print in the console we can use the log.info statemenet:
+log.info "  This is my first print in the log"   
+
+// Groovy is a loosly coupled language, which means that for defining a variable you do not need to indicate the datatype of it, because the
+// variable can accept any dataType when the value is assigned to the variable.
+String name = "hector"  // this will displays a popup indicating result is hector.
+def name2 
+name2 = "name2"
+log.info "  name2 as string: "+name2 
+name2 = 33
+log.info "  name2 as Integer: "+name2 
+
+name3 = "name3"
+log.info "  name3 as String witout using Def: "+name3
+name4 =89
+log.info "  name4 as Interger witout using Def: "+name4
+def name5 = "NAME-5"
+def name6 = "NAME-6"
+def String StrVariable = "hector"
+log.info "  StrVariable: " + StrVariable
+   StrVariable = 45
+log.info "  StrVariable: " + StrVariable
+// we can concatenate using th '+' and '$' in front of the variable name $varName:
+log.info "  StrVariable: $StrVariable in concatenation"
+log.info "  StrVariable: " + StrVariable
+log.info "number of Variables is "+StrVariable+" variables"   // OR
+log.info "number of Variables is $StrVariable variables"   
+log.info "number of Variables is ${StrVariable} variables"   
+numberOfPages = 96
+if(numberOfPages==76) {
+	log.info "  Completed reading"
+}
+else {
+	log.info "  Still reading"
+}	
+if (numberOfPages > 100) {
+	log.info "  you are an extraordinary reader"
+	}
+result = true
+if (result) { log.info "Result is true"}
+if (result) {
+	log.info "    Result is true"
+	}
+else {log.info "   Result is false"}	
+numVideos = 50
+//if assertion is not true then program will stop here abending execution of the following sentences. a popup displayed
+assert numVideos == 50     
+log.info "  numVideos is 50 "
+log.info "  numVideos is NOT 50 "
+
+//for loop
+for (int i=0; i < 10; i++) {
+	log.info "   i =: ${i}"
+	}
+for (int i=4; i <= 10; i++) {
+	log.info " second  i =: ${i}"
+	}	
+// while loop
+def j = 1
+while (j < 5){
+   log.info " the value of j is: $j"	
+   j++
+}
+j = 0
+while (j <= 5){
+   log.info " value of j is: $j"	
+   j++
+}
+
+// Arrays declaration 
+ def cars = new String [5]
+ cars[0] = "Honda"
+ cars[1] = "Toyota"
+ cars[2] = "Chevrolet"
+ cars[3] = "Camaro"
+ cars[4] = "IOn"
+// printing the cars Array:
+for (def k=0; k < 5; k++) {
+    log.info "   cars [$k] = " + cars[k]	
+    log.info cars[k]	   
+}
+// getting the size of the array: using array.size() method.
+  log.info "   cars array size is: " + cars.size()
+  arraySize = cars.size()
+  for (def k=0; k < arraySize; k++){
+  	log.info "  **** cars array size is: " + cars.size()
+  }
+ def terms = ["SOAPUI","TRAINING","ONLINE","IT"]
+ log.info "terms[0] = " + terms[0]
+ log.info "terms[2] = " + terms[2]
+ // loop to print all
+ for ( i=0; i < terms.size(); i++) {
+ 	log.info " term [$i] " + terms[i]
+ 	}
+
+ // Exceptions are used when we want to handle any exception that occurs without the program to abend.
+ try {
+ 	def  x = 4 / 0
+ 	}
+ catch (Exception except){
+ 	log.info " division by zero exception  ***" + except
+ 	} 	
+// ArrayList definition: the ArrayList does not have a limit on the number of elements in the Array, and we use the array.Add(). .get(x)
+// and others methods to handle the datea. this is what we call a dynamic array, because we can keep adding elements:
+ def ArrayList arrList = new ArrayList()
+ arrList.add("abde")
+ log.info "    arrList[0]:    " + arrList.get(0)
+ arrList.add(2222)
+ log.info "    arrList[0]:    " + arrList.get(1)
+ // print total of elements in the ArrayList:
+ log.info "   total elements so far: " + arrList.size()
+
+ // HashTable are table with two columns, or key, value pairs, where we can access the value by indicating the key;
+ Hashtable courseTable = new Hashtable()
+ courseTable.put("course name","SOAPUI") //To add a key-value pair we use the .put() method.
+ courseTable.put("countryOffered", "India")
+ courseTable.put("period","night")
+ courseTable.put("teacher","Rahul")
+ log.info "  Course Name: " +courseTable.get("course name") //to access the value we need to use the .get("key") method with the keyName.
+ log.info "  teacher: " + courseTable.get("teacher")
+
+ // Map data structures:
+ def mapCourse=["course Name":"SELENIUM", "teacher":"hector Hernandez", "language":"Emglish"] 
+ log.info " mapCourse Name: "+ mapCourse["course Name"]
+ log.info " teacher: " + mapCourse["teacher"]
+
+ // List
+ def listItem = [1,"car","tab;e",45,"university"]
+ log.info "  Element [1]: " + listItem[1]
+ log.info "  Element [3]: " + listItem[3]
+ log.info "  Element [4]: " + listItem[4]
+ ]]></script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
